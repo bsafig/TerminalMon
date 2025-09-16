@@ -86,13 +86,42 @@ def handle_command(tmon, command):
             return f"Gained {amount} XP!"
         except ValueError:
             return "Invalid XP amount."
+    elif command.startswith("release "):
+        try:
+            _, name = command.split(" ", 1)
+            mons = utils.list_terminalmon()
+            if name in mons:
+                if tmon.name == name:
+                    return "Cannot release your buddy TerminalMon."
+                os.remove("../json/" + name + ".json")
+                return f"Released TerminalMon: {name}"
+            else:
+                return f"TerminalMon {name} does not exist."
+        except Exception as e:
+            return str(e)
+    elif command.startswith("editm "):
+        try:
+            _, name, new_name = command.split(" ", 2)
+            mons = utils.list_terminalmon()
+            if name in mons:
+                old_path = os.path.join("../json", f"{name}.json")
+                new_path = os.path.join("../json", f"{new_name}.json")
+                os.rename(old_path, new_path)
+                if tmon.name == name:
+                    tmon.name = new_name
+                    utils.save_terminalmon(tmon.get_stats())
+                return f"Renamed TerminalMon {name} to {new_name}"
+            else:
+                return f"TerminalMon {name} does not exist."
+        except Exception as e:
+            return str(e)
     elif command == "help":
-        return "Commands:\nstats - prints stats of buddy TerminalMon\nlearn <move> - teaches script of name move to buddy TerminalMon\nforget <move> - forgets a learned move\nnew <name> - creates a new TerminalMon with name <name>\nbuddy <name> - changes the current buddy TerminalMon to an existing Mon with name <name>\nlist - displays a list of all created TerminalMon\nquit"
+        return "Commands:\nstats - prints stats of buddy TerminalMon\nlearn <move> - teaches script of name move to buddy TerminalMon\nforget <move> - forgets a learned move\nnew <name> - creates a new TerminalMon with name <name>\nbuddy <name> - changes the current buddy TerminalMon to an existing Mon with name <name>\nrelease <name> - releases a TerminalMon with the given name\neditm <old_name> <new_name> - edits the name of the TerminalMon with the given name\nlist - displays a list of all created TerminalMon\nquit"
     elif command == "quit":
         utils.save_terminalmon(tmon.get_stats())
         return "Daemon quitting..."
     else:
-        return "Unknown command. Try: stats, xp <amount>, learn <attack>, quit"
+        return "Unknown command. Try: tmon help"
 
 if __name__ == "__main__":
     start_daemon()
