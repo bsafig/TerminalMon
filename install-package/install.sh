@@ -14,6 +14,7 @@ cd ..
 
 #ensure json is empty
 echo cleaning json folder
+mkdir ./json
 cd ./json
 rm -r *
 cd ..
