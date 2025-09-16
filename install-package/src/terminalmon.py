@@ -1,4 +1,5 @@
-import json, utils
+# terminalmon.py
+import utils
 
 class terminalmon:
     def __init__(self, name, xp=0, level=1, learned_attacks=None, evolution_stage=0):
@@ -14,22 +15,22 @@ class terminalmon:
 
     def check_level_up(self):
         level_threshold = self.level * 10
-        if self.xp >= level_threshold:
+        while self.xp >= level_threshold:
             self.xp -= level_threshold
             self.level += 1
-            print(f"🎉 {self.name} leveled up to level {self.level}!")
-            self.check_level_up()
+            print(f"🎉 {utils.colorize_name(self.name)} leveled up to level {self.level}!")
             self.check_evolve()
+            level_threshold = self.level * 10
 
     def check_evolve(self):
         if self.level in (30, 60, 90):
             self.evolution_stage += 1
-            print(f"🔄 {self.name} has evolved to stage {self.evolution_stage}!")
+            print(f"🔄 {utils.colorize_name(self.name)} evolved to stage {self.evolution_stage}!")
 
     def learn_attack(self, attack_name):
         if attack_name not in self.learned_attacks:
             self.learned_attacks.append(attack_name)
-    
+
     def forget_attack(self, attack_name):
         if attack_name in self.learned_attacks:
             self.learned_attacks.remove(attack_name)
@@ -43,8 +44,8 @@ class terminalmon:
             "evolution_stage": self.evolution_stage
         }
 
-    def print_stats(self):       
-        print("TerminalMon Stats:")
+    def print_stats(self):
+        print("📊 TerminalMon Stats:")
         print(f"Name: {utils.colorize_name(self.name)}")
         print(f"Level: {self.level}")
         print(f"XP: {self.xp}/{self.level * 10}")
