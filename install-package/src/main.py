@@ -14,7 +14,7 @@ def main():
 
     if not os.path.exists(BUDDY_FILE) or os.stat(BUDDY_FILE).st_size == 0:
         print("🎉 No TerminalMon found. Let's create your first one!\n")
-        name = input("Enter your TerminalMon's name: ")
+        name = input("Enter your TerminalMon's name: ").lower()
 
         # Create and set as buddy
         utils.create_terminalmon(name)
