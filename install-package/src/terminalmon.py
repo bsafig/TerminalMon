@@ -1,19 +1,19 @@
-import json
+import json, utils
 
 class terminalmon:
-    def __init__(self, name, xp=0, level=1, learned_attacks=None):
+    def __init__(self, name, xp=0, level=1, learned_attacks=None, evolution_stage=0):
         self.name = name
         self.xp = xp
         self.level = level
         self.learned_attacks = learned_attacks or []
-        self.can_evolve = False
+        self.evolution_stage = evolution_stage
 
     def gain_xp(self, amount):
         self.xp += amount
         self.check_level_up()
 
     def check_level_up(self):
-        level_threshold = pow(10, self.level)
+        level_threshold = self.level * 10
         if self.xp >= level_threshold:
             self.xp -= level_threshold
             self.level += 1
@@ -23,15 +23,8 @@ class terminalmon:
 
     def check_evolve(self):
         if self.level in (30, 60, 90):
-            self.can_evolve = True
-            print(f"🔥 {self.name} can now evolve!")
-
-    def evolve(self, new_name):
-        if self.can_evolve:
-            oldname = self.name
-            self.name = new_name
-            self.can_evolve = False
-            print(f"🌟 {oldname} evolved into {self.name}!")
+            self.evolution_stage += 1
+            print(f"🔄 {self.name} has evolved to stage {self.evolution_stage}!")
 
     def learn_attack(self, attack_name):
         if attack_name not in self.learned_attacks:
@@ -46,9 +39,14 @@ class terminalmon:
             "name": self.name,
             "xp": self.xp,
             "level": self.level,
-            "learned_attacks": self.learned_attacks
+            "learned_attacks": self.learned_attacks,
+            "evolution_stage": self.evolution_stage
         }
 
-    def print_stats(self):
-        print("📊 TerminalMon Stats:")
-        print(json.dumps(self.get_stats(), indent=4))
+    def print_stats(self):       
+        print("TerminalMon Stats:")
+        print(f"Name: {utils.colorize_name(self.name)}")
+        print(f"Level: {self.level}")
+        print(f"XP: {self.xp}/{self.level * 10}")
+        print(f"Evolution Stage: {self.evolution_stage}")
+        print(f"Learned Attacks: {', '.join(self.learned_attacks) or 'None'}")

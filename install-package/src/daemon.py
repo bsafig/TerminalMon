@@ -46,7 +46,7 @@ def start_daemon():
 def handle_command(tmon, command):
     command = command.lower()
     if command == "stats":
-        return json.dumps(tmon.get_stats(), indent=4)
+        return tmon.print_stats() or ""
     elif command.startswith("learn "):
         _, attack = command.split(" ", 1)
         tmon.learn_attack(attack)
@@ -70,8 +70,7 @@ def handle_command(tmon, command):
             utils.set_buddy(name)
             tmon_data = utils.load_terminalmon()
             tmon = terminalmon(**tmon_data)
-            utils.save_terminalmon(tmon.get_stats())
-            return f"Set buddy to: {name}"
+            return f"Set buddy to: {utils.colorize_name(name)}"
         except FileNotFoundError:
             return f"TerminalMon {name} does not exist."
     elif command == "list":
@@ -94,7 +93,7 @@ def handle_command(tmon, command):
                 if tmon.name == name:
                     return "Cannot release your buddy TerminalMon."
                 os.remove("../json/" + name + ".json")
-                return f"Released TerminalMon: {name}"
+                return f"Released TerminalMon: {utils.colorize_name(name)}"
             else:
                 return f"TerminalMon {name} does not exist."
         except Exception as e:
@@ -110,7 +109,7 @@ def handle_command(tmon, command):
                 if tmon.name == name:
                     tmon.name = new_name
                     utils.save_terminalmon(tmon.get_stats())
-                return f"Renamed TerminalMon {name} to {new_name}"
+                return f"Renamed TerminalMon {utils.colorize_name(name)} to {utils.colorize_name(new_name)}"
             else:
                 return f"TerminalMon {name} does not exist."
         except Exception as e:
