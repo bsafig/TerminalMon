@@ -30,10 +30,13 @@ class terminalmon:
     def learn_attack(self, attack_name):
         if attack_name not in self.learned_attacks:
             self.learned_attacks.append(attack_name)
+            utils.create_attack_script(attack_name)
 
     def forget_attack(self, attack_name):
         if attack_name in self.learned_attacks:
             self.learned_attacks.remove(attack_name)
+            if not utils.is_attack_used_elsewhere(attack_name, self.name):
+                utils.delete_attack_script(attack_name)
 
     def get_stats(self):
         return {

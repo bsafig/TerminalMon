@@ -1,8 +1,6 @@
 # daemon.py
 import os
 import socket
-import json
-import time
 import utils
 from terminalmon import terminalmon
 
@@ -44,66 +42,72 @@ def start_daemon():
     os.remove(SOCKET_PATH)
 
 def handle_command(tmon, command, buddy_name):
-    command = command.lower()
+    parts = command.split(" ", 1)
+    cmd = parts[0].lower()
+    arg = parts[1] if len(parts) > 1 else ""
 
-    if command == "stats":
+    if cmd == "stats":
         return tmon.print_stats() or "", buddy_name
 
-    elif command.startswith("learn "):
-        _, attack = command.split(" ", 1)
-        tmon.learn_attack(attack)
+    elif cmd == "learn":
+        tmon.learn_attack(arg)
         utils.save_terminalmon(tmon.get_stats(), name=buddy_name)
-        return f"Learned attack: {attack}", buddy_name
+        return f"Learned attack: {arg}", buddy_name
 
-    elif command.startswith("forget "):
-        _, attack = command.split(" ", 1)
-        tmon.forget_attack(attack)
+    elif cmd == "forget":
+        tmon.forget_attack(arg)
         utils.save_terminalmon(tmon.get_stats(), name=buddy_name)
-        return f"Forgot attack: {attack}", buddy_name
+        return f"Forgot attack: {arg}", buddy_name
 
-    elif command.startswith("new "):
-        _, name = command.split(" ", 1)
-        utils.create_terminalmon(name)
-        return f"Created new TerminalMon: {name}", buddy_name
+    elif cmd == "edita":
+        message = utils.edit_attack_script(arg)
+        return message, buddy_name
 
-    elif command.startswith("buddy "):
-        _, name = command.split(" ", 1)
+
+    elif cmd == "use":
+        if arg in tmon.learned_attacks:
+            ran = utils.run_attack_script(arg)
+            if ran:
+                return f"Used {arg}!", buddy_name
+            return f"Attack script {arg}.sh not found.", buddy_name
+        return f"{arg} is not a learned attack.", buddy_name
+
+    elif cmd == "new":
+        utils.create_terminalmon(arg)
+        return f"Created new TerminalMon: {arg}", buddy_name
+
+    elif cmd == "buddy":
         try:
-            utils.set_buddy(name)
+            utils.set_buddy(arg)
             tmon_data = utils.load_terminalmon()
             tmon.__init__(**tmon_data)
-            return f"Set buddy to: {utils.colorize_name(name)}", name
+            return f"Set buddy to: {utils.colorize_name(arg)}", arg
         except FileNotFoundError:
-            return f"TerminalMon {name} does not exist.", buddy_name
+            return f"TerminalMon {arg} does not exist.", buddy_name
 
-    elif command == "list":
-        mons = utils.list_terminalmon()
-        return "Created TerminalMon:\n" + "\n".join(mons), buddy_name
+    elif cmd == "list":
+        return "Created TerminalMon:\n" + "\n".join(utils.list_terminalmon()), buddy_name
 
-    elif command.startswith("xp "):
+    elif cmd == "xp":
         try:
-            _, amount = command.split(" ", 1)
-            amount = int(amount)
+            amount = int(arg)
             tmon.gain_xp(amount)
             utils.save_terminalmon(tmon.get_stats(), name=buddy_name)
             return f"Gained {amount} XP!", buddy_name
         except ValueError:
             return "Invalid XP amount.", buddy_name
 
-    elif command.startswith("release "):
-        _, name = command.split(" ", 1)
-        if name == buddy_name:
+    elif cmd == "release":
+        if arg == buddy_name:
             return "Cannot release your buddy TerminalMon.", buddy_name
-        mons = utils.list_terminalmon()
-        if name in mons:
-            os.remove(os.path.join(utils.JSON_DIR, f"{name}.json"))
-            return f"Released TerminalMon: {utils.colorize_name(name)}", buddy_name
-        else:
-            return f"TerminalMon {name} does not exist.", buddy_name
+        if arg in utils.list_terminalmon():
+            os.remove(os.path.join(utils.JSON_DIR, f"{arg}.json"))
+            return f"Released TerminalMon: {utils.colorize_name(arg)}", buddy_name
+        return f"TerminalMon {arg} does not exist.", buddy_name
 
-    elif command.startswith("editm "):
+    elif cmd == "editm":
         try:
-            _, old_name, new_name = command.split(" ", 2)
+            old_name, new_name = arg.split(" ")
             old_path = os.path.join(utils.JSON_DIR, f"{old_name}.json")
             new_path = os.path.join(utils.JSON_DIR, f"{new_name}.json")
             if os.path.exists(old_path):
@@ -119,12 +123,14 @@ def handle_command(tmon, command, buddy_name):
         except Exception as e:
             return str(e), buddy_name
 
-    elif command == "help":
+    elif cmd == "help":
         return (
             "Commands:\n"
             "stats - prints stats of buddy\n"
             "learn <move> - teaches a move\n"
             "forget <move> - forgets a move\n"
+            "edita <move> - edit move script\n"
+            "use <move> - run move script\n"
             "new <name> - creates a new TerminalMon\n"
             "buddy <name> - switch current buddy\n"
             "release <name> - deletes a TerminalMon\n"
@@ -134,12 +140,11 @@ def handle_command(tmon, command, buddy_name):
             "quit - stop daemon"
         , buddy_name)
 
-    elif command == "quit":
+    elif cmd == "quit":
         utils.save_terminalmon(tmon.get_stats(), name=buddy_name)
         return "Daemon quitting...", buddy_name
 
-    else:
-        return "Unknown command. Try: tmon help", buddy_name
+    return "Unknown command. Try: tmon help", buddy_name
 
 if __name__ == "__main__":
     start_daemon()
