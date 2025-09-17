@@ -23,7 +23,7 @@ class terminalmon:
             level_threshold = self.level * 10
 
     def check_evolve(self):
-        if self.level in (30, 60, 90):
+        if (self.level % 30 == 0) and self.evolution_stage < 6:
             self.evolution_stage += 1
             print(f"🔄 {utils.colorize_name(self.name)} evolved to stage {self.evolution_stage}!")
 

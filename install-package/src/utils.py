@@ -58,9 +58,12 @@ def colorize_name(name):
     evolution_stage = load_terminalmon().get("evolution_stage", 0)
     colors = {
         0: "\033[97m",  # White
-        1: "\033[94m",  # Blue
-        2: "\033[91m",  # Red
-        3: "\033[95m",  # Purple
+        1: "\033[92m",  # Green
+        2: "\033[93m",  # Yellow
+        3: "\033[94m",  # Blue
+        4: "\033[91m",  # Red
+        5: "\033[96m",  # Cyan
+        6: "\033[95m",  # Purple
     }
     reset = "\033[0m"
     try:
