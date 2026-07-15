@@ -1,5 +1,9 @@
 # TerminalMon
 
+[![PyPI version](https://img.shields.io/pypi/v/terminalmon.svg)](https://pypi.org/project/terminalmon/)
+[![Python versions](https://img.shields.io/pypi/pyversions/terminalmon.svg)](https://pypi.org/project/terminalmon/)
+[![License: MIT](https://img.shields.io/pypi/l/terminalmon.svg)](https://github.com/bsafig/TerminalMon/blob/main/LICENSE)
+
 Pokémon-inspired terminal experience. Gain XP by running shell commands and
 earn and use "moves" (custom scripts). Unaffiliated with official Pokémon
 branding — all names are original and user-created.
