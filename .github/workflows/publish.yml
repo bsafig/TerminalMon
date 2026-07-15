@@ -4,6 +4,8 @@ name: Publish to PyPI
 # Uses PyPI Trusted Publishing (OIDC) — no API tokens or stored secrets.
 
 on:
+  push:
+    tags: ["v*"]
   release:
     types: [published]
 
