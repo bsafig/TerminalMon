@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# TerminalMon runtime artifacts
+tmon.log
+nohup.out
+
+# Legacy local data (pre-package layout)
+json/
+scripts/nohup.out
